@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>스앰님의 어깨통증 완치 프로젝트</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+
+    /* ───── HERO ───── */
+    .hero {
+      background: linear-gradient(160deg, #0a1628 0%, #0f2952 60%, #1a4a8a 100%);
+      color: white;
+      padding: 80px 24px 100px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(59,130,246,0.25);
+      border: 1px solid rgba(59,130,246,0.5);
+      color: #93c5fd;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 6px 18px;
+      border-radius: 999px;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 900;
+      line-height: 1.25;
+      margin-bottom: 24px;
+      word-break: keep-all;
+    }
+    .hero h1 .point { color: #60a5fa; }
+    .hero p {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: #cbd5e1;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      word-break: keep-all;
+    }
+    .hero-cta {
+      display: inline-block;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px 48px;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 8px 32px rgba(59,130,246,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(59,130,246,0.5);
+    }
+    .hero-sub {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    /* ───── STATS ───── */
+    .stats {
+      background: #f8fafc;
+      padding: 48px 24px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .stats-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      flex: 1;
+      min-width: 160px;
+      text-align: center;
+      padding: 24px 16px;
+      border-right: 1px solid #e2e8f0;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-size: 36px;
+      font-weight: 900;
+      color: #1e40af;
+      display: block;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* ───── SECTION COMMON ───── */
+    section { padding: 80px 24px; }
+    .section-inner { max-width: 720px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 16px;
+      word-break: keep-all;
+    }
+    .section-desc {
+      font-size: 17px;
+      color: #475569;
+      word-break: keep-all;
+      line-height: 1.8;
+    }
+
+    /* ───── PAIN ───── */
+    .pain { background: #fff; }
+    .pain-list {
+      list-style: none;
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .pain-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 18px 20px;
+      font-size: 16px;
+      color: #1a1a1a;
+      word-break: keep-all;
+    }
+    .pain-list li .icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ───── FOR WHO ───── */
+    .forwho { background: #f0f7ff; }
+    .forwho-grid {
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .forwho-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: white;
+      border-radius: 12px;
+      padding: 18px 20px;
+      font-size: 16px;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      word-break: keep-all;
+    }
+    .forwho-item .check {
+      width: 28px;
+      height: 28px;
+      background: #1d4ed8;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ───── INSTRUCTOR ───── */
+    .instructor { background: #fff; }
+    .instructor-card {
+      margin-top: 40px;
+      background: linear-gradient(135deg, #0f2952, #1a4a8a);
+      border-radius: 20px;
+      padding: 40px 36px;
+      color: white;
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .instructor-avatar {
+      width: 100px;
+      height: 100px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      flex-shrink: 0;
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+    .instructor-info h3 {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .instructor-info p {
+      font-size: 15px;
+      color: #bfdbfe;
+      line-height: 1.8;
+      margin-bottom: 20px;
+      word-break: keep-all;
+    }
+    .instructor-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .instructor-badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 999px;
+    }
+
+    /* ───── CURRICULUM ───── */
+    .curriculum { background: #f8fafc; }
+    .curriculum-list {
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .curriculum-item {
+      background: white;
+      border-radius: 16px;
+      padding: 28px 28px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .curriculum-num {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      font-size: 18px;
+      font-weight: 900;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .curriculum-content h4 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .curriculum-content p {
+      font-size: 15px;
+      color: #64748b;
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+    .curriculum-tag {
+      display: inline-block;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+
+    /* ───── RESULT ───── */
+    .result { background: #fff; }
+    .result-grid {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .result-item {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .result-item .emoji { font-size: 32px; margin-bottom: 12px; }
+    .result-item h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; word-break: keep-all; }
+    .result-item p { font-size: 14px; color: #475569; word-break: keep-all; }
+
+    /* ───── PRICING ───── */
+    .pricing {
+      background: linear-gradient(160deg, #0a1628 0%, #0f2952 100%);
+      color: white;
+      text-align: center;
+    }
+    .pricing .section-tag { background: rgba(59,130,246,0.2); color: #93c5fd; }
+    .pricing .section-title { color: white; }
+    .pricing-card {
+      margin: 40px auto 0;
+      max-width: 480px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 40px 32px;
+      backdrop-filter: blur(10px);
+    }
+    .pricing-label {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    .pricing-price {
+      font-size: 52px;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+    }
+    .pricing-price span { font-size: 24px; font-weight: 500; }
+    .pricing-sub {
+      font-size: 14px;
+      color: #60a5fa;
+      font-weight: 600;
+      margin-top: 8px;
+      margin-bottom: 32px;
+    }
+    .pricing-includes {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pricing-includes li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      color: #cbd5e1;
+    }
+    .pricing-includes li::before {
+      content: '✓';
+      color: #60a5fa;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .pricing-cta {
+      display: block;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 8px 32px rgba(59,130,246,0.4);
+      transition: transform 0.2s;
+    }
+    .pricing-cta:hover { transform: translateY(-2px); }
+    .pricing-guarantee {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    /* ───── FAQ ───── */
+    .faq { background: #f8fafc; }
+    .faq-list {
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .faq-item {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+    .faq-q {
+      padding: 20px 24px;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      word-break: keep-all;
+    }
+    .faq-q::after { content: '+'; font-size: 22px; color: #3b82f6; flex-shrink: 0; margin-left: 12px; }
+    .faq-a {
+      padding: 0 24px 20px;
+      font-size: 15px;
+      color: #475569;
+      line-height: 1.8;
+      word-break: keep-all;
+    }
+
+    /* ───── FINAL CTA ───── */
+    .final-cta {
+      background: #fff;
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .final-cta h2 {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 900;
+      margin-bottom: 16px;
+      word-break: keep-all;
+    }
+    .final-cta p {
+      font-size: 17px;
+      color: #475569;
+      margin-bottom: 36px;
+      word-break: keep-all;
+    }
+
+    /* ───── FOOTER ───── */
+    footer {
+      background: #0a1628;
+      color: #475569;
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .result-grid { grid-template-columns: 1fr; }
+      .instructor-card { flex-direction: column; }
+      .stat-item { border-right: none; border-bottom: 1px solid #e2e8f0; }
+      .stat-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ① HERO -->
+<section class="hero">
+  <div class="hero-badge">어깨통증 완치 프로젝트</div>
+  <h1>
+    병원도, 약도 아닌<br>
+    <span class="point">내 몸이 스스로 낫는</span><br>
+    어깨통증 완치법
+  </h1>
+  <p>
+    40~60대를 위한 맞춤 재활운동.<br>
+    단 2개 영상으로 어깨 통증의 원인부터 해결까지.
+  </p>
+  <a href="#pricing" class="hero-cta">지금 바로 수강하기 →</a>
+  <p class="hero-sub">영구소장 · 49,900원 · 라이브클래스 안전 결제</p>
+</section>
+
+<!-- ② STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-num">2만+</span>
+      <span class="stat-label">유튜브 구독자</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">1만+</span>
+      <span class="stat-label">인스타그램 팔로워</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">체육학과</span>
+      <span class="stat-label">전공 전문가</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">영구소장</span>
+      <span class="stat-label">한번 사면 평생</span>
+    </div>
+  </div>
+</div>
+
+<!-- ③ PAIN POINTS -->
+<section class="pain">
+  <div class="section-inner">
+    <span class="section-tag">이런 분 계신가요?</span>
+    <h2 class="section-title">어깨 때문에<br>이런 고민 하셨죠?</h2>
+    <ul class="pain-list">
+      <li><span class="icon">😣</span> 아침에 일어나면 어깨가 뻣뻣하고 팔 올리기가 힘드신 분</li>
+      <li><span class="icon">💊</span> 진통제, 파스만으로 버티고 있지만 반복되는 통증에 지치신 분</li>
+      <li><span class="icon">🏥</span> 병원에서 "쉬세요"라는 말만 듣고 돌아오신 분</li>
+      <li><span class="icon">😔</span> 유튜브로 운동 따라 해봤지만 내 상황에 맞는지 모르겠는 분</li>
+      <li><span class="icon">🌙</span> 밤에 어깨 통증으로 잠을 설치고 계신 분</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ④ FOR WHO -->
+<section class="forwho">
+  <div class="section-inner">
+    <span class="section-tag">수강 대상</span>
+    <h2 class="section-title">이런 분들을 위해<br>만들었습니다</h2>
+    <div class="forwho-grid">
+      <div class="forwho-item">
+        <div class="check">✓</div>
+        40~60대로 어깨 통증을 오래 달고 사신 분
+      </div>
+      <div class="forwho-item">
+        <div class="check">✓</div>
+        병원 치료를 받아도 재발이 반복되는 분
+      </div>
+      <div class="forwho-item">
+        <div class="check">✓</div>
+        운동을 시작하고 싶지만 어디서부터 해야 할지 모르는 분
+      </div>
+      <div class="forwho-item">
+        <div class="check">✓</div>
+        집에서 혼자 따라 할 수 있는 재활운동이 필요한 분
+      </div>
+      <div class="forwho-item">
+        <div class="check">✓</div>
+        유튜브 영상은 봤지만 제대로 된 가이드가 필요한 분
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ INSTRUCTOR -->
+<section class="instructor">
+  <div class="section-inner">
+    <span class="section-tag">강사 소개</span>
+    <h2 class="section-title">어깨 전문<br>스앰님을 소개합니다</h2>
+    <div class="instructor-card">
+      <div class="instructor-avatar">🏋️</div>
+      <div class="instructor-info">
+        <h3>스앰님 (어깨통증X 전문가)</h3>
+        <p>
+          체육학과 전공으로 인체 구조와 재활 운동을 깊이 공부했습니다.<br>
+          유튜브 채널 <strong style="color:white">「어깨통증X스앰님」</strong>을 운영하며<br>
+          2만 명이 넘는 구독자에게 어깨 통증 해결법을 알려왔습니다.<br><br>
+          "약이나 주사 없이도, 올바른 움직임 하나로 어깨는 나을 수 있습니다."
+        </p>
+        <div class="instructor-badges">
+          <span class="instructor-badge">체육학과 전공</span>
+          <span class="instructor-badge">유튜브 2만 구독</span>
+          <span class="instructor-badge">인스타 1만 팔로워</span>
+          <span class="instructor-badge">재활운동 전문</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ CURRICULUM -->
+<section class="curriculum">
+  <div class="section-inner">
+    <span class="section-tag">강의 구성</span>
+    <h2 class="section-title">단 2개의 영상으로<br>완성되는 어깨 완치 루틴</h2>
+    <p class="section-desc">복잡하지 않습니다. 핵심만 담았습니다.</p>
+    <div class="curriculum-list">
+      <div class="curriculum-item">
+        <div class="curriculum-num">1</div>
+        <div class="curriculum-content">
+          <span class="curriculum-tag">설명 영상</span>
+          <h4>어깨통증의 진짜 원인 완전 정복</h4>
+          <p>
+            왜 어깨가 아픈지, 어떤 구조로 통증이 생기는지를 쉽게 설명합니다.
+            원인을 알아야 올바르게 고칠 수 있습니다.
+            병원에서도 알려주지 않는 핵심 원리를 담았습니다.
+          </p>
+        </div>
+      </div>
+      <div class="curriculum-item">
+        <div class="curriculum-num">2</div>
+        <div class="curriculum-content">
+          <span class="curriculum-tag">시연 영상</span>
+          <h4>집에서 따라하는 어깨 완치 재활 루틴</h4>
+          <p>
+            특별한 도구 없이 집에서 바로 따라 할 수 있는 재활 동작을 직접 시연합니다.
+            40~60대 몸 상태에 맞춘 강도로, 천천히 따라오시면 됩니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑦ RESULT -->
+<section class="result">
+  <div class="section-inner">
+    <span class="section-tag">수강 후 변화</span>
+    <h2 class="section-title">이 강의를 들으면<br>이렇게 달라집니다</h2>
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="emoji">💪</div>
+        <h4>팔이 시원하게 올라간다</h4>
+        <p>굳었던 어깨 가동범위가 점점 넓어집니다</p>
+      </div>
+      <div class="result-item">
+        <div class="emoji">😴</div>
+        <h4>밤에 편하게 잠든다</h4>
+        <p>수면을 방해하던 어깨 통증이 줄어듭니다</p>
+      </div>
+      <div class="result-item">
+        <div class="emoji">🏥</div>
+        <h4>병원 의존도가 낮아진다</h4>
+        <p>스스로 관리하는 능력이 생깁니다</p>
+      </div>
+      <div class="result-item">
+        <div class="emoji">🔄</div>
+        <h4>재발 없는 몸을 만든다</h4>
+        <p>원인을 알고 근본부터 해결합니다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑧ PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-inner">
+    <span class="section-tag">수강 신청</span>
+    <h2 class="section-title">지금 바로 시작하세요</h2>
+    <div class="pricing-card">
+      <p class="pricing-label">어깨통증 완치 프로젝트 · 영구소장</p>
+      <div class="pricing-price"><span>₩</span>49,900</div>
+      <p class="pricing-sub">✨ 한 번 구매 후 평생 소장</p>
+      <ul class="pricing-includes">
+        <li>어깨통증 원인 완전 정복 설명 영상</li>
+        <li>집에서 따라하는 재활 루틴 시연 영상</li>
+        <li>영구 소장 (기간 제한 없음)</li>
+        <li>라이브클래스 안전 결제 시스템</li>
+      </ul>
+      <a href="#" class="pricing-cta">지금 수강 신청하기 →</a>
+      <p class="pricing-guarantee">🔒 라이브클래스를 통한 안전한 결제</p>
+    </div>
+  </div>
+</section>
+
+<!-- ⑨ FAQ -->
+<section class="faq">
+  <div class="section-inner">
+    <span class="section-tag">자주 묻는 질문</span>
+    <h2 class="section-title">궁금한 점이 있으신가요?</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">운동을 전혀 안 해본 사람도 따라 할 수 있나요?</div>
+        <div class="faq-a">네, 가능합니다. 특별한 기구나 운동 경험이 없어도 집에서 바로 따라 하실 수 있도록 쉽게 구성했습니다. 40~60대 체력에 맞춘 강도로 진행됩니다.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">한번 구매하면 얼마나 볼 수 있나요?</div>
+        <div class="faq-a">영구 소장입니다. 한 번 구매하시면 기간 제한 없이 언제든지 반복해서 보실 수 있습니다.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">오십견, 회전근개 파열에도 도움이 되나요?</div>
+        <div class="faq-a">어깨 통증의 다양한 원인에 대한 이해를 돕고 재활 루틴을 안내합니다. 단, 심각한 부상이 있으신 분은 의료 전문가와 상담 후 수강하시길 권장합니다.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">스마트폰으로도 볼 수 있나요?</div>
+        <div class="faq-a">네, 라이브클래스 앱 또는 모바일 웹에서 스마트폰, 태블릿, PC 모두 시청 가능합니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑩ FINAL CTA -->
+<section class="final-cta">
+  <h2>어깨 통증, 이제 끝낼 시간입니다</h2>
+  <p>더 이상 참지 마세요. 올바른 방법으로 시작하면<br>어깨는 반드시 나아집니다.</p>
+  <a href="#pricing" class="hero-cta">수강 신청하기 · ₩49,900 →</a>
+</section>
+
+<footer>
+  <p>© 2025 스앰님의 어깨통증 완치 프로젝트 · 문의: 인스타그램 @어깨통증X스앰님</p>
+</footer>
+
+</body>
+</html>
