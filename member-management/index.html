@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="theme-color" content="#1d4ed8" />
+<title>회원관리 - 재활운동센터</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  :root {
+    --blue: #1d4ed8;
+    --blue-light: #eff6ff;
+    --text: #1a1a1a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --red: #dc2626;
+    --red-light: #fff1f2;
+    --green: #16a34a;
+    --green-light: #f0fdf4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding-bottom: 76px;
+  }
+  #shell { max-width: 560px; margin: 0 auto; min-height: 100vh; background: var(--bg); position: relative; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--blue); color: #fff;
+    padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-weight: 700; font-size: 17px;
+  }
+  .topbar button {
+    background: rgba(255,255,255,.15); border: none; color: #fff;
+    width: 34px; height: 34px; border-radius: 50%; font-size: 16px; cursor: pointer;
+  }
+
+  .page { padding: 16px; }
+  .page-title { font-size: 19px; font-weight: 900; }
+  .page-header-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+  .section { margin-top: 22px; }
+  .section-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+
+  .loading, .error-box { padding: 40px 16px; text-align: center; color: var(--muted); }
+  .error-box { color: var(--red); }
+
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden;
+  }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .stat-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+  .stat-value { font-size: 20px; font-weight: 900; color: var(--blue); }
+
+  .row-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 14px;
+  }
+  .row-item:last-child { border-bottom: none; }
+  .row-item.clickable { cursor: pointer; }
+  .row-item.clickable:active { background: var(--blue-light); }
+  .row-item.column { flex-direction: column; align-items: stretch; gap: 4px; }
+  .row-item-top { display: flex; justify-content: space-between; }
+  .row-item.center { justify-content: center; padding: 26px 14px; }
+
+  .muted { color: var(--muted); }
+  .small { font-size: 12.5px; }
+
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px;
+    border-radius: 999px; margin-left: 6px;
+  }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-gray { background: #f1f5f9; color: var(--muted); }
+
+  .input, select.input, textarea.input {
+    width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px;
+    font-size: 14px; font-family: inherit; margin-top: 10px; background: #fff; color: var(--text);
+  }
+
+  .btn-primary, .btn-outline, .btn-danger, .btn-link {
+    font-family: inherit; font-weight: 700; cursor: pointer; border-radius: 10px;
+    padding: 10px 16px; font-size: 14px; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-outline { background: #fff; color: var(--blue); border-color: var(--blue); }
+  .btn-danger { background: #fff; color: var(--red); border-color: var(--red); }
+  .btn-link { background: none; border: none; color: var(--blue); padding: 6px 0; margin-bottom: 8px; }
+  .btn-primary.small, .btn-outline.small, .btn-danger.small { padding: 7px 12px; font-size: 12.5px; }
+
+  .bottomnav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+    display: flex; background: #fff; border-top: 1px solid var(--border);
+    max-width: 560px; margin: 0 auto;
+  }
+  .bottomnav button {
+    flex: 1; background: none; border: none; padding: 9px 4px 10px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    color: var(--muted); font-family: inherit; font-size: 11px; font-weight: 600;
+  }
+  .bottomnav button .icon { font-size: 19px; }
+  .bottomnav button.active { color: var(--blue); }
+
+  .form { display: flex; flex-direction: column; }
+  .form label, .stacked {
+    display: flex; flex-direction: column; font-size: 12.5px; font-weight: 700; color: var(--muted);
+    margin-top: 12px; gap: 0;
+  }
+  .form label:first-child, .stacked { margin-top: 0; }
+  .form input, .form select, .form textarea, .stacked input, .stacked select {
+    margin-top: 6px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+    font-size: 14px; font-family: inherit; color: var(--text); background: #fff;
+  }
+  .form textarea { min-height: 60px; resize: vertical; }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+  .modal-actions button { flex: 0 0 auto; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(15,23,42,.5); z-index: 50;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  .modal-box {
+    background: #fff; width: 100%; max-width: 560px; border-radius: 18px 18px 0 0;
+    padding: 20px 18px 26px; max-height: 88vh; overflow-y: auto;
+  }
+  .modal-box h3 { font-size: 16px; margin-bottom: 4px; }
+  .modal-box p { font-size: 13.5px; color: var(--muted); margin-top: 6px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 90px; transform: translate(-50%, 20px);
+    background: #1a1a1a; color: #fff; padding: 10px 18px; border-radius: 999px;
+    font-size: 13.5px; opacity: 0; pointer-events: none; transition: all .2s ease; z-index: 100;
+    max-width: 85%; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast.error { background: var(--red); }
+
+  .detail-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; margin-top: 14px; font-size: 13.5px;
+  }
+  .detail-grid > div { display: flex; flex-direction: column; gap: 2px; }
+  .detail-grid b { font-size: 14px; }
+  .member-detail-card { padding: 16px; }
+  .note-box { margin-top: 10px; background: var(--bg); border-radius: 8px; padding: 8px 10px; }
+
+  .guide-list { margin: 10px 0 0 18px; font-size: 13px; color: var(--muted); line-height: 1.9; }
+  .guide-list code { background: var(--bg); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+  <div id="shell">
+    <div class="topbar">
+      <span>🏃 재활운동센터 회원관리</span>
+      <button id="settings-btn" title="설정">⚙</button>
+    </div>
+    <main id="app"></main>
+    <nav class="bottomnav">
+      <button data-tab="dashboard"><span class="icon">🏠</span>홈</button>
+      <button data-tab="members"><span class="icon">🧑‍🤝‍🧑</span>회원</button>
+      <button data-tab="attendance"><span class="icon">✅</span>출석</button>
+      <button data-tab="rehab"><span class="icon">🩹</span>재활기록</button>
+      <button data-tab="payments"><span class="icon">💳</span>결제</button>
+    </nav>
+  </div>
+  <div id="modal-root"></div>
+  <div id="toast" class="toast"></div>
+
+<script>
+  const LS_KEY = 'rehab_member_api_url';
+  const getScriptUrl = () => localStorage.getItem(LS_KEY) || '';
+  const setScriptUrl = (v) => localStorage.setItem(LS_KEY, v);
+
+  const state = { tab: 'dashboard', members: [], currentMemberId: null };
+
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+  function formatCurrency(n) { return Number(n || 0).toLocaleString('ko-KR') + '원'; }
+  function todayStr() {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
+  function toast(msg, isError = false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (isError ? ' error' : '');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => { el.className = 'toast'; }, 2600);
+  }
+
+  async function apiGet(action, params = {}) {
+    const base = getScriptUrl();
+    if (!base) throw new Error('설정에서 Apps Script URL을 먼저 입력해주세요.');
+    const url = new URL(base);
+    url.searchParams.set('action', action);
+    Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, v); });
+    const res = await fetch(url.toString());
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || '요청 실패');
+    return json.result;
+  }
+  async function apiPost(action, data = {}) {
+    const base = getScriptUrl();
+    if (!base) throw new Error('설정에서 Apps Script URL을 먼저 입력해주세요.');
+    const res = await fetch(base, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action, data })
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || '요청 실패');
+    return json.result;
+  }
+
+  function showModal(html) {
+    const root = document.getElementById('modal-root');
+    root.innerHTML = `<div class="modal-backdrop" id="modal-backdrop"><div class="modal-box">${html}</div></div>`;
+    document.getElementById('modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'modal-backdrop') closeModal(); });
+  }
+  function closeModal() { document.getElementById('modal-root').innerHTML = ''; }
+
+  function listCard(inner) { return `<div class="card">${inner}</div>`; }
+  function emptyRow(msg) { return `<div class="card"><div class="row-item muted center">${msg}</div></div>`; }
+  function emptyRowInline(msg) { return `<div class="row-item muted center small">${msg}</div>`; }
+
+  function emptyStateNoUrl() {
+    return `<div class="page">
+      <div class="card" style="padding:24px; text-align:center;">
+        <p style="margin-bottom:14px;">아직 연결된 구글 시트가 없습니다.<br/>설정에서 Apps Script 웹앱 URL을 입력해주세요.</p>
+        <button class="btn-primary" onclick="switchTab('settings')">설정하러 가기</button>
+      </div>
+    </div>`;
+  }
+
+  /* ---------- 라우팅 ---------- */
+
+  document.querySelectorAll('.bottomnav button').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+  document.getElementById('settings-btn').addEventListener('click', () => switchTab('settings'));
+
+  function switchTab(tab) {
+    state.tab = tab;
+    document.querySelectorAll('.bottomnav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    render();
+  }
+
+  async function render() {
+    const app = document.getElementById('app');
+    if (!getScriptUrl() && state.tab !== 'settings') {
+      app.innerHTML = emptyStateNoUrl();
+      return;
+    }
+    app.innerHTML = '<div class="loading">불러오는 중...</div>';
+    try {
+      switch (state.tab) {
+        case 'dashboard': await renderDashboard(); break;
+        case 'members': await renderMembers(); break;
+        case 'attendance': await renderAttendance(); break;
+        case 'rehab': await renderRehab(); break;
+        case 'payments': await renderPayments(); break;
+        case 'settings': await renderSettings(); break;
+      }
+    } catch (e) {
+      app.innerHTML = `<div class="error-box">오류: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  /* ---------- 대시보드 ---------- */
+
+  async function renderDashboard() {
+    const summary = await apiGet('summary');
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="page">
+        <h2 class="page-title">대시보드</h2>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">활성 회원</div><div class="stat-value">${summary.activeCount}</div></div>
+          <div class="stat-card"><div class="stat-label">이번달 신규</div><div class="stat-value">${summary.newThisMonth}</div></div>
+          <div class="stat-card"><div class="stat-label">이번달 매출</div><div class="stat-value">${formatCurrency(summary.revenueThisMonth)}</div></div>
+          <div class="stat-card"><div class="stat-label">오늘 출석</div><div class="stat-value">${summary.todayVisits}</div></div>
+        </div>
+        <section class="section">
+          <h3 class="section-title">⚠️ 만료 임박 (7일 이내)</h3>
+          ${summary.expiringSoon.length ? listCard(summary.expiringSoon.map(m => `
+            <div class="row-item">
+              <div><b>${escapeHtml(m.name)}</b><span class="muted"> · ${escapeHtml(m.phone)}</span></div>
+              <div class="muted">${escapeHtml(m.expireDate)} 만료</div>
+            </div>`).join('')) : emptyRow('만료 임박 회원이 없습니다.')}
+        </section>
+        <section class="section">
+          <h3 class="section-title">🔔 잔여횟수 부족 (2회 이하)</h3>
+          ${summary.lowRemaining.length ? listCard(summary.lowRemaining.map(m => `
+            <div class="row-item">
+              <div><b>${escapeHtml(m.name)}</b><span class="muted"> · ${escapeHtml(m.phone)}</span></div>
+              <div class="muted">잔여 ${escapeHtml(String(m.remainingCount))}회</div>
+            </div>`).join('')) : emptyRow('해당 회원이 없습니다.')}
+        </section>
+      </div>`;
+  }
+
+  /* ---------- 회원 ---------- */
+
+  async function renderMembers() {
+    const members = await apiGet('listMembers');
+    state.members = members;
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="page">
+        <div class="page-header-row">
+          <h2 class="page-title">회원 (${members.length})</h2>
+          <button class="btn-primary small" id="btn-add-member">+ 회원등록</button>
+        </div>
+        <input type="text" id="member-search" class="input" placeholder="이름 또는 연락처 검색">
+        <div class="card" id="member-list" style="margin-top:10px;">${renderMemberRows(members)}</div>
+      </div>`;
+    document.getElementById('btn-add-member').onclick = () => openMemberForm();
+    document.getElementById('member-search').addEventListener('input', (e) => {
+      const q = e.target.value.trim();
+      const filtered = members.filter(m => m.name.includes(q) || String(m.phone).includes(q));
+      document.getElementById('member-list').innerHTML = renderMemberRows(filtered);
+      bindMemberRowClicks();
+    });
+    bindMemberRowClicks();
+  }
+
+  function renderMemberRows(members) {
+    if (!members.length) return `<div class="row-item muted center">등록된 회원이 없습니다.</div>`;
+    return members.map(m => `
+      <div class="row-item clickable" data-id="${m.id}">
+        <div>
+          <b>${escapeHtml(m.name)}</b>
+          <span class="badge ${m.status === '활성' ? 'badge-green' : 'badge-gray'}">${escapeHtml(m.status)}</span>
+          <div class="muted small">${escapeHtml(m.phone)}${m.passType ? ' · ' + escapeHtml(m.passType) : ''}</div>
+        </div>
+        <div class="muted small">잔여 ${m.remainingCount !== '' ? escapeHtml(String(m.remainingCount)) + '회' : '-'}</div>
+      </div>`).join('');
+  }
+  function bindMemberRowClicks() {
+    document.querySelectorAll('#member-list .row-item.clickable').forEach(el => {
+      el.onclick = () => openMemberDetail(el.dataset.id);
+    });
+  }
+
+  function openMemberForm(member = null) {
+    const isEdit = !!member;
+    const m = member || {};
+    showModal(`
+      <h3>${isEdit ? '회원 정보 수정' : '회원 등록'}</h3>
+      <form id="member-form" class="form">
+        <label>이름*<input required name="name" value="${escapeHtml(m.name || '')}"></label>
+        <label>연락처<input name="phone" value="${escapeHtml(m.phone || '')}" placeholder="010-0000-0000"></label>
+        <label>생년월일<input type="date" name="birth" value="${escapeHtml(m.birth || '')}"></label>
+        <label>이용권 종류<input name="passType" value="${escapeHtml(m.passType || '')}" placeholder="예: 10회권, 1개월 정기권"></label>
+        <label>총 횟수<input type="number" min="0" name="totalCount" value="${m.totalCount ?? ''}" placeholder="기간권이면 비워두세요"></label>
+        <label>시작일<input type="date" name="startDate" value="${escapeHtml(m.startDate || todayStr())}"></label>
+        <label>만료일<input type="date" name="expireDate" value="${escapeHtml(m.expireDate || '')}"></label>
+        <label>담당 트레이너<input name="trainer" value="${escapeHtml(m.trainer || '')}"></label>
+        <label>비고<textarea name="note">${escapeHtml(m.note || '')}</textarea></label>
+        ${isEdit ? `<label>상태
+          <select name="status">
+            <option value="활성" ${m.status === '활성' ? 'selected' : ''}>활성</option>
+            <option value="휴면" ${m.status === '휴면' ? 'selected' : ''}>휴면</option>
+            <option value="만료" ${m.status === '만료' ? 'selected' : ''}>만료</option>
+          </select></label>` : ''}
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" id="modal-cancel">취소</button>
+          <button type="submit" class="btn-primary">${isEdit ? '저장' : '등록'}</button>
+        </div>
+      </form>
+    `);
+    document.getElementById('modal-cancel').onclick = closeModal;
+    document.getElementById('member-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      if (isEdit) data.id = m.id;
+      try {
+        if (isEdit) { await apiPost('updateMember', data); toast('수정되었습니다.'); }
+        else { await apiPost('addMember', data); toast('등록되었습니다.'); }
+        closeModal();
+        if (isEdit && state.currentMemberId) openMemberDetail(state.currentMemberId);
+        else switchTab('members');
+      } catch (err) { toast(err.message, true); }
+    };
+  }
+
+  async function openMemberDetail(id) {
+    state.currentMemberId = id;
+    const app = document.getElementById('app');
+    app.innerHTML = `<div class="loading">불러오는 중...</div>`;
+    const [members, visits, rehab, payments] = await Promise.all([
+      apiGet('listMembers'),
+      apiGet('listVisits', { memberId: id, limit: 20 }),
+      apiGet('listRehabRecords', { memberId: id }),
+      apiGet('listPayments', { memberId: id })
+    ]);
+    state.members = members;
+    const member = members.find(m => m.id === id);
+    if (!member) { toast('회원 정보를 찾을 수 없습니다.', true); switchTab('members'); return; }
+
+    app.innerHTML = `
+      <div class="page">
+        <button class="btn-link" id="back-btn">← 목록으로</button>
+        <div class="card member-detail-card">
+          <div class="page-header-row">
+            <h2 class="page-title">${escapeHtml(member.name)} <span class="badge ${member.status === '활성' ? 'badge-green' : 'badge-gray'}">${escapeHtml(member.status)}</span></h2>
+          </div>
+          <div class="muted">${escapeHtml(member.phone)}${member.birth ? ' · ' + escapeHtml(member.birth) : ''}</div>
+          <div class="detail-grid">
+            <div><span class="muted">이용권</span><b>${escapeHtml(member.passType || '-')}</b></div>
+            <div><span class="muted">잔여횟수</span><b>${member.remainingCount !== '' ? escapeHtml(String(member.remainingCount)) + ' / ' + escapeHtml(String(member.totalCount)) + '회' : '-'}</b></div>
+            <div><span class="muted">시작일</span><b>${escapeHtml(member.startDate || '-')}</b></div>
+            <div><span class="muted">만료일</span><b>${escapeHtml(member.expireDate || '-')}</b></div>
+            <div><span class="muted">담당 트레이너</span><b>${escapeHtml(member.trainer || '-')}</b></div>
+          </div>
+          ${member.note ? `<div class="muted small note-box">${escapeHtml(member.note)}</div>` : ''}
+          <div class="modal-actions" style="justify-content:flex-start; flex-wrap:wrap;">
+            <button class="btn-outline small" id="btn-edit">수정</button>
+            <button class="btn-primary small" id="btn-checkin">출석 체크</button>
+            <button class="btn-danger small" id="btn-delete">삭제</button>
+          </div>
+        </div>
+
+        <section class="section">
+          <h3 class="section-title">방문 기록</h3>
+          <div class="card">${visits.length ? visits.map(v => `<div class="row-item"><div>${escapeHtml(v.visitAt)}</div><div class="muted small">${escapeHtml(v.trainer || '')}</div></div>`).join('') : emptyRowInline('방문 기록이 없습니다.')}</div>
+        </section>
+        <section class="section">
+          <div class="page-header-row"><h3 class="section-title">재활 기록</h3><button class="btn-outline small" id="btn-add-rehab">+ 기록추가</button></div>
+          <div class="card">${rehab.length ? rehab.map(r => `
+            <div class="row-item column">
+              <div class="row-item-top"><b>${escapeHtml(r.date)}</b><span class="muted small">${escapeHtml(r.area || '')}</span></div>
+              <div class="small">${escapeHtml(r.exercise || '')}</div>
+              ${r.painLevel !== '' ? `<div class="muted small">통증강도: ${escapeHtml(String(r.painLevel))}</div>` : ''}
+              ${r.note ? `<div class="muted small">${escapeHtml(r.note)}</div>` : ''}
+            </div>`).join('') : emptyRowInline('재활 기록이 없습니다.')}</div>
+        </section>
+        <section class="section">
+          <div class="page-header-row"><h3 class="section-title">결제 내역</h3><button class="btn-outline small" id="btn-add-payment">+ 결제추가</button></div>
+          <div class="card">${payments.length ? payments.map(p => `
+            <div class="row-item"><div><b>${escapeHtml(p.item)}</b><div class="muted small">${escapeHtml(p.date)}</div></div><div>${formatCurrency(p.amount)}</div></div>`).join('') : emptyRowInline('결제 내역이 없습니다.')}</div>
+        </section>
+      </div>`;
+
+    document.getElementById('back-btn').onclick = () => switchTab('members');
+    document.getElementById('btn-edit').onclick = () => openMemberForm(member);
+    document.getElementById('btn-delete').onclick = () => confirmDeleteMember(member);
+    document.getElementById('btn-checkin').onclick = () => doCheckIn(member.id, () => openMemberDetail(id));
+    document.getElementById('btn-add-rehab').onclick = () => openRehabForm(member, () => openMemberDetail(id));
+    document.getElementById('btn-add-payment').onclick = () => openPaymentForm(member, () => openMemberDetail(id));
+  }
+
+  function confirmDeleteMember(member) {
+    showModal(`
+      <h3>회원 삭제</h3>
+      <p>${escapeHtml(member.name)} 회원을 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</p>
+      <div class="modal-actions">
+        <button class="btn-outline" id="modal-cancel">취소</button>
+        <button class="btn-danger" id="confirm-delete">삭제</button>
+      </div>`);
+    document.getElementById('modal-cancel').onclick = closeModal;
+    document.getElementById('confirm-delete').onclick = async () => {
+      try { await apiPost('deleteMember', { id: member.id }); toast('삭제되었습니다.'); closeModal(); switchTab('members'); }
+      catch (e) { toast(e.message, true); }
+    };
+  }
+
+  /* ---------- 출석 ---------- */
+
+  async function doCheckIn(memberId, after) {
+    try {
+      const result = await apiPost('checkIn', { memberId });
+      toast(`${result.member.name}님 출석 처리되었습니다.`);
+      if (after) after();
+    } catch (e) { toast(e.message, true); }
+  }
+
+  async function renderAttendance() {
+    const [members, visits] = await Promise.all([apiGet('listMembers'), apiGet('listVisits', { limit: 30 })]);
+    state.members = members;
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="page">
+        <h2 class="page-title">출석 체크</h2>
+        <input type="text" id="attend-search" class="input" placeholder="회원 이름 검색 후 출석 체크">
+        <div class="card" id="attend-list" style="margin-top:10px;">${renderAttendRows(members.filter(m => m.status === '활성'))}</div>
+        <section class="section">
+          <h3 class="section-title">최근 출석</h3>
+          <div class="card">${visits.length ? visits.map(v => `<div class="row-item"><div><b>${escapeHtml(v.memberName)}</b></div><div class="muted small">${escapeHtml(v.visitAt)}</div></div>`).join('') : emptyRowInline('출석 기록이 없습니다.')}</div>
+        </section>
+      </div>`;
+    document.getElementById('attend-search').addEventListener('input', e => {
+      const q = e.target.value.trim();
+      const filtered = members.filter(m => m.status === '활성' && m.name.includes(q));
+      document.getElementById('attend-list').innerHTML = renderAttendRows(filtered);
+      bindAttendClicks();
+    });
+    bindAttendClicks();
+  }
+  function renderAttendRows(members) {
+    if (!members.length) return emptyRowInline('활성 회원이 없습니다.');
+    return members.map(m => `
+      <div class="row-item">
+        <div><b>${escapeHtml(m.name)}</b><div class="muted small">잔여 ${m.remainingCount !== '' ? escapeHtml(String(m.remainingCount)) + '회' : '-'}</div></div>
+        <button class="btn-primary small checkin-btn" data-id="${m.id}">출석</button>
+      </div>`).join('');
+  }
+  function bindAttendClicks() {
+    document.querySelectorAll('.checkin-btn').forEach(btn => {
+      btn.onclick = () => doCheckIn(btn.dataset.id, renderAttendance);
+    });
+  }
+
+  /* ---------- 재활기록 ---------- */
+
+  async function renderRehab() {
+    const [members, records] = await Promise.all([apiGet('listMembers'), apiGet('listRehabRecords')]);
+    state.members = members;
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="page">
+        <h2 class="page-title">재활 기록</h2>
+        <div class="card" style="padding:14px; margin-top:10px;">
+          <label class="stacked">회원 선택
+            <select id="rehab-member-select">
+              <option value="">회원을 선택하세요</option>
+              ${members.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('')}
+            </select>
+          </label>
+          <button class="btn-primary" id="btn-add-rehab" style="width:100%; margin-top:10px;">+ 기록 추가</button>
+        </div>
+        <section class="section">
+          <h3 class="section-title">최근 기록</h3>
+          <div class="card">${records.length ? records.slice(0, 50).map(r => `
+            <div class="row-item column">
+              <div class="row-item-top"><b>${escapeHtml(r.memberName)}</b><span class="muted small">${escapeHtml(r.date)}</span></div>
+              <div class="small">${escapeHtml(r.area || '')}${r.exercise ? ' · ' + escapeHtml(r.exercise) : ''}</div>
+            </div>`).join('') : emptyRowInline('기록이 없습니다.')}</div>
+        </section>
+      </div>`;
+    document.getElementById('btn-add-rehab').onclick = () => {
+      const sel = document.getElementById('rehab-member-select');
+      const member = members.find(m => m.id === sel.value);
+      if (!member) { toast('회원을 먼저 선택하세요.', true); return; }
+      openRehabForm(member, renderRehab);
+    };
+  }
+
+  function openRehabForm(member, after) {
+    showModal(`
+      <h3>${escapeHtml(member.name)} - 재활 기록 추가</h3>
+      <form id="rehab-form" class="form">
+        <label>날짜<input type="date" name="date" value="${todayStr()}"></label>
+        <label>통증 부위/증상<input name="area" placeholder="예: 오른쪽 어깨"></label>
+        <label>운동 내용<textarea name="exercise" placeholder="진행한 운동/프로그램 내용"></textarea></label>
+        <label>통증 강도 (0~10)<input type="number" name="painLevel" min="0" max="10"></label>
+        <label>담당 트레이너<input name="trainer"></label>
+        <label>메모<textarea name="note"></textarea></label>
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" id="modal-cancel">취소</button>
+          <button type="submit" class="btn-primary">저장</button>
+        </div>
+      </form>`);
+    document.getElementById('modal-cancel').onclick = closeModal;
+    document.getElementById('rehab-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      data.memberId = member.id;
+      try { await apiPost('addRehabRecord', data); toast('저장되었습니다.'); closeModal(); if (after) after(); }
+      catch (err) { toast(err.message, true); }
+    };
+  }
+
+  /* ---------- 결제 ---------- */
+
+  async function renderPayments() {
+    await renderPaymentsForMonth(todayStr().slice(0, 7));
+  }
+  async function renderPaymentsForMonth(month) {
+    const [members, payments] = await Promise.all([apiGet('listMembers'), apiGet('listPayments', { month })]);
+    state.members = members;
+    const total = payments.reduce((s, p) => s + Number(p.amount || 0), 0);
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="page">
+        <div class="page-header-row">
+          <h2 class="page-title">결제/매출</h2>
+          <button class="btn-primary small" id="btn-add-payment">+ 결제등록</button>
+        </div>
+        <input type="month" id="month-filter" class="input" value="${month}">
+        <div class="stat-card" style="margin:10px 0;"><div class="stat-label">${month} 매출 합계</div><div class="stat-value">${formatCurrency(total)}</div></div>
+        <div class="card">${payments.length ? payments.map(p => `
+          <div class="row-item">
+            <div><b>${escapeHtml(p.memberName)}</b><div class="muted small">${escapeHtml(p.date)} · ${escapeHtml(p.item)}${p.method ? ' · ' + escapeHtml(p.method) : ''}</div></div>
+            <div>${formatCurrency(p.amount)}</div>
+          </div>`).join('') : emptyRowInline('결제 내역이 없습니다.')}</div>
+      </div>`;
+    document.getElementById('month-filter').addEventListener('change', e => renderPaymentsForMonth(e.target.value));
+    document.getElementById('btn-add-payment').onclick = () => openPaymentSelectMember(members);
+  }
+  function openPaymentSelectMember(members) {
+    showModal(`
+      <h3>결제 등록</h3>
+      <label class="stacked">회원 선택
+        <select id="payment-member-select">
+          <option value="">회원을 선택하세요</option>
+          ${members.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('')}
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button class="btn-outline" id="modal-cancel">취소</button>
+        <button class="btn-primary" id="modal-next">다음</button>
+      </div>`);
+    document.getElementById('modal-cancel').onclick = closeModal;
+    document.getElementById('modal-next').onclick = () => {
+      const sel = document.getElementById('payment-member-select');
+      const member = members.find(m => m.id === sel.value);
+      if (!member) { toast('회원을 선택하세요.', true); return; }
+      openPaymentForm(member, () => renderPayments());
+    };
+  }
+  function openPaymentForm(member, after) {
+    showModal(`
+      <h3>${escapeHtml(member.name)} - 결제 등록</h3>
+      <form id="payment-form" class="form">
+        <label>결제일<input type="date" name="date" value="${todayStr()}"></label>
+        <label>항목<input name="item" placeholder="예: 10회권 재등록" required></label>
+        <label>금액<input type="number" name="amount" required min="0"></label>
+        <label>결제수단
+          <select name="method">
+            <option value="카드">카드</option>
+            <option value="현금">현금</option>
+            <option value="계좌이체">계좌이체</option>
+          </select>
+        </label>
+        <label>담당자<input name="staff"></label>
+        <label>비고<textarea name="note"></textarea></label>
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" id="modal-cancel">취소</button>
+          <button type="submit" class="btn-primary">저장</button>
+        </div>
+      </form>`);
+    document.getElementById('modal-cancel').onclick = closeModal;
+    document.getElementById('payment-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      data.memberId = member.id;
+      try { await apiPost('addPayment', data); toast('결제가 등록되었습니다.'); closeModal(); if (after) after(); }
+      catch (err) { toast(err.message, true); }
+    };
+  }
+
+  /* ---------- 설정 ---------- */
+
+  async function renderSettings() {
+    const app = document.getElementById('app');
+    const current = getScriptUrl();
+    app.innerHTML = `
+      <div class="page">
+        <h2 class="page-title">설정</h2>
+        <div class="card" style="padding:16px; margin-top:10px;">
+          <label class="stacked">Google Apps Script 웹앱 URL
+            <input type="text" id="script-url-input" class="input" style="margin-top:6px;" placeholder="https://script.google.com/macros/s/xxxx/exec" value="${escapeHtml(current)}">
+          </label>
+          <div class="modal-actions" style="justify-content:flex-start; flex-wrap:wrap;">
+            <button class="btn-outline" id="btn-test">연결 테스트</button>
+            <button class="btn-outline" id="btn-setup">시트 초기화</button>
+            <button class="btn-primary" id="btn-save">저장</button>
+          </div>
+          <p class="muted small" id="settings-status"></p>
+        </div>
+        <div class="card" style="padding:16px; margin-top:12px;">
+          <b>설정 방법 안내</b>
+          <ol class="guide-list">
+            <li>Google Sheets에서 새 스프레드시트를 만듭니다.</li>
+            <li>확장 프로그램 → Apps Script 메뉴를 엽니다.</li>
+            <li>이 프로젝트의 <code>Code.gs</code> 내용을 붙여넣고 저장합니다.</li>
+            <li>배포 → 새 배포 → 유형: 웹 앱 선택, 실행 계정: 나, 액세스 권한: 전체(익명 포함)로 설정 후 배포합니다.</li>
+            <li>발급된 웹 앱 URL을 위 입력창에 붙여넣고 저장 → 시트 초기화를 누릅니다.</li>
+          </ol>
+        </div>
+      </div>`;
+    document.getElementById('btn-save').onclick = () => {
+      const v = document.getElementById('script-url-input').value.trim();
+      setScriptUrl(v);
+      toast('저장되었습니다.');
+    };
+    document.getElementById('btn-test').onclick = async () => {
+      const v = document.getElementById('script-url-input').value.trim();
+      setScriptUrl(v);
+      const statusEl = document.getElementById('settings-status');
+      statusEl.textContent = '연결 확인 중...';
+      try { const r = await apiGet('ping'); statusEl.textContent = '✅ 연결 성공: ' + r.sheets.join(', '); }
+      catch (e) { statusEl.textContent = '❌ 연결 실패: ' + e.message; }
+    };
+    document.getElementById('btn-setup').onclick = async () => {
+      try { const r = await apiPost('setup', {}); toast('시트가 초기화되었습니다: ' + r.sheets.join(', ')); }
+      catch (e) { toast(e.message, true); }
+    };
+  }
+
+  /* ---------- 초기 실행 ---------- */
+
+  switchTab(getScriptUrl() ? 'dashboard' : 'settings');
+</script>
+</body>
+</html>
